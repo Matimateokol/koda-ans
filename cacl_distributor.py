@@ -11,6 +11,8 @@ NUMBER_OF_SYMBOLS = POSSIBLE_BYTES_VALUES = 256
 class rANSData:
     distributor : List[int]
     frequency : List[int]
+    interval_size : int
+    renormalization_size : int
 
 def byte_probabilities_from_directory(directory):
     counts = [0] * NUMBER_OF_SYMBOLS
@@ -42,7 +44,7 @@ def calculate_distributor_list(directory):
         distributor[i+1] = cur_sum
     distributor[-1] = INTERVAL_SIZE
 
-    return rANSData(distributor, frequency)
+    return rANSData(distributor, frequency, 15, 20)
 
 def restore_interval_size_in_frequency(const_raw_freq: Sequence[float], frequency : List[int], const_freq_sum : int) -> None:
     errors = [(const_raw_freq[i] - frequency[i], i) for i in range(NUMBER_OF_SYMBOLS)]
