@@ -1,4 +1,4 @@
-from cacl_distributor import rANSData, calculate_distributor_list
+from cacl_distributor import rANSData, calculate_distributor_list, calculateModelForData
 from pathlib import Path
 
 
@@ -35,9 +35,25 @@ def rans_decode(state: int, model: rANSData):
 
 
 if __name__ == "__main__":
-    ransdata = rANSData([0, 2, 3], [2, 1, 1], 2, 3)
+    ransdata = rANSData([0, 2, 3], [2, 1, 1], 8, 3)
 
     data = b'\x01\x00\x00\x00\x01\x02\x01\x01\x00'
+    encoded = rans_encode(data, ransdata)
+    decoded = rans_decode(encoded, ransdata)
+    assert data == decoded
+    print(encoded.bit_length())
+
+    print("### TEST on image data ###")
+
+    from PIL import Image
+    import numpy as np
+
+    data_path = "data/obrazy_testowe/boat.pgm"
+    img = Image.open(data_path).convert("L")  # L = grayscale
+    data = np.array(img).flatten()
+    ransdata = calculateModelForData(data)
+
+    #data = b'\x01\x00\x00\x00\x01\x02\x01\x01\x00'
     encoded = rans_encode(data, ransdata)
     decoded = rans_decode(encoded, ransdata)
     assert data == decoded

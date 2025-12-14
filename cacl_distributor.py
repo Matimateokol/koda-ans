@@ -67,8 +67,15 @@ def restore_interval_size_in_frequency(const_raw_freq: Sequence[float], frequenc
             if elements_to_add == 0:
                 break
 
+def calculateModelForData(input: Sequence[int]) -> rANSData:
+    freq = [0] * 256
+    for i in input:
+        freq[i] += 1
+    cdf = [sum(freq[:i]) for i in range(0, 256)]
+    return rANSData(cdf, freq, 8, 3)
+
 if __name__ == "__main__":
-    directory = Path.joinpath(Path.cwd(), "rozklady_testowe")
+    directory = Path.joinpath(Path.cwd(), "data/obrazy_testowe/boat/")
     if directory.is_dir():
         a = calculate_distributor_list(directory)
         print(sum(a.frequency))
