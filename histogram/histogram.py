@@ -1,11 +1,14 @@
 import numpy as np
+from PIL import Image
 
-def histogram(data, alphabet_size=None):
+def histogram(data_path, alphabet_size=None):
     """
     data: 1D array / bytes / list
     alphabet_size: eg. 256 for bytes (optional)
     """
-    data = np.asarray(data)
+    img = Image.open(data_path)
+    data = np.asarray(img)
+    data = data.ravel().astype(np.int64)
 
     if alphabet_size is None:
         values, counts = np.unique(data, return_counts=True)

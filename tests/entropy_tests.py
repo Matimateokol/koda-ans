@@ -40,34 +40,41 @@ from PIL import Image
 import numpy as np
 
 distr_dir_path = "data/rozklady_testowe/"
-distr_name = "geometr_05.pgm"
-distr_path = distr_dir_path + distr_name
 
-def load_pgm(path):
-    img = Image.open(path).convert("L")  # L = grayscale
+distr_data_set = [
+    "geometr_05.pgm", "geometr_09.pgm", "geometr_099.pgm", "laplace_10.pgm", "laplace_20.pgm", "laplace_30.pgm",
+    "normal_10.pgm", "normal_30.pgm", "normal_50.pgm", "uniform.pgm"
+]
+
+image_dir_path = "data/obrazy_testowe/"
+
+image_data_set = [
+    "barbara.pgm", "boat.pgm", "chronometer.pgm", "lena.pgm", "mandril.pgm", "peppers.pgm"
+]
+
+def run_entropy_test(datafile_name, data_folder_path):
+    data_path = data_folder_path + datafile_name
+    img = Image.open(data_path).convert("L")  # L = grayscale
     data = np.array(img)
-    return data
 
-img = load_pgm(distr_path)
-print(img.shape)
+    print("Data shape: ", data.shape)
 
-# Histogram #
-def histogram_pgm(img):
+    # Make a histogram
     # flattening to 1D
-    data = img.flatten()
+    data = data.flatten()
     hist = np.bincount(data, minlength=256)
-    return hist
 
-hist = histogram_pgm(img)
-
-# Entropia #
-
-import numpy as np
-
-def entropy_from_hist(hist):
-    hist = hist[hist > 0]          # usuwamy zera
+    # Calculate entropy
+    hist = hist[hist > 0]          # removing zeros
     probs = hist / hist.sum()
-    return -np.sum(probs * np.log2(probs))
+    H = -np.sum(probs * np.log2(probs))
+    
+    print(f"Entropia obrazu {datafile_name} :", H, "bit/piksel. [From Histogram]")
+    print(f"Entropia obrazu {datafile_name} :", shannon_entropy(data, 256), "bit/piksel. [From Shannon Entropy]")
 
-H = entropy_from_hist(hist)
-print(f"Entropia obrazu {distr_name} :", H, "bit/piksel")
+
+for distr_data_name in distr_data_set:
+    run_entropy_test(distr_data_name, distr_dir_path)
+
+for image_data_name in image_data_set:
+    run_entropy_test(image_data_name, image_dir_path)
