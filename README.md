@@ -17,3 +17,15 @@ Example:
 
 ``` python3 -m tests.entropy_tests ```
 ``` python3 -m tests.histogram_tests ```
+
+
+
+temp
+8 -> 16 -> (00) 4 -> 8 -> 34 -> 8 (02)
+0
+
+R = 4:
+16 -> 32 -> (00) -> 8 -> 34 -> (11) -> 8
+
+
+16 -> 32 -> (00) -> 8 -> 35 -> (11) -> 8 -> 16
