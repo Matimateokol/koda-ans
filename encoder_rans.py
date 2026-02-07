@@ -37,7 +37,7 @@ def rans_encode(data: bytes, model: rANSData) -> bytes:
     res.extend(reversed(stream))
     return bytes(res)
 
-def run_encoder(src_filename=None, dst_filename=None, base_dir_name=None):
+def run_encoder(src_filename=None, dst_filename=None,base_dir_name=None):
     print("+++++ URUCHOMIONO APLIKACJĘ KODER +++++")
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--src_filename', dest='src_filename', type=str, help='A name of the file to be compressed.', default='')
@@ -58,31 +58,34 @@ def run_encoder(src_filename=None, dst_filename=None, base_dir_name=None):
         print("Plik nie istnieje!"); return
 
     header, pixels = read_pgm(path)
-    orig_size = os.path.getsize(path)
+    data_stream = header + pixels
+    orig_size = len(data_stream)
     
     print(f"[*] Wczytano: {path.name} ({format_size(orig_size)})")
-    model = calculate_model_from_data(pixels)
+    model = calculate_model_from_data(data_stream)
     
-    encoded_body = rans_encode(pixels, model)
+    encoded_body = rans_encode(data_stream, model)
     
     out_path = Path(_base_dir_name + _dst_filename)
     with open(out_path, "wb") as f:
-        f.write(b"RANS")
         for freq in model.frequency: f.write(struct.pack("<I", freq))
-        f.write(struct.pack("<I", len(pixels)))
-        f.write(struct.pack("<I", len(header)))
-        f.write(header)
+        f.write(struct.pack("<I", len(data_stream)))
         f.write(encoded_body)
-    
-    comp_size = os.path.getsize(out_path)
+
+    comp_size = os.path.getsize(out_path) # Ok, account for frequency header!
     ratio = (comp_size / orig_size) * 100
+    average_symbol_length = (len(encoded_body) * 8) / len(data_stream)
     
     print("-" * 40)
     print(f"PLIK SKOMPRESOWANY: {out_path}")
-    print(f"Oryginalny: {format_size(orig_size)}")
-    print(f"Skompresowany: {format_size(comp_size)} (Stopień: {ratio:.2f}%)")
+    #print(f"Oryginalny: {format_size(orig_size)}")
+    print(f"Oryginalny: {orig_size}")
+    #print(f"Skompresowany: {format_size(comp_size)} (Stopień: {ratio:.2f}%)")
+    print(f"Skompresowany: {comp_size} (Stopień: {ratio:.2f}%)")
+    print(f"Długość nagłówka: 1028")
+    print(f"Średnia długość symbolu strumienia rANS po zakodowaniu {average_symbol_length:.2f} bitów")
     print("-" * 40)
-    
+
 
 if __name__ == "__main__":
     run_encoder()

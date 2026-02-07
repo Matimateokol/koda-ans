@@ -65,12 +65,8 @@ def run_decoder(src_filename=None, dst_filename=None, base_dir_name=None):
         print("Plik nie istnieje!"); return
 
     with open(path, "rb") as f:
-        if f.read(4) != b"RANS":
-            print("To nie jest plik RANS!"); return
         freqs = [struct.unpack("<I", f.read(4))[0] for _ in range(256)]
         orig_size = struct.unpack("<I", f.read(4))[0]
-        hlen = struct.unpack("<I", f.read(4))[0]
-        header = f.read(hlen)
         body = f.read()
 
     dist = [0] * 257
@@ -81,7 +77,6 @@ def run_decoder(src_filename=None, dst_filename=None, base_dir_name=None):
     
     out_path = Path(_base_dir_name + _dst_filename)
     with open(out_path, "wb") as f:
-        f.write(header)
         f.write(decoded)
     
     print(f"[*] Zdekodowano do: {out_path}")
